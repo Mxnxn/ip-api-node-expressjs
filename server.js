@@ -31,6 +31,7 @@ const User = require("./routes/User");
 const Product = require("./routes/Product");
 const Category = require("./routes/Category");
 
+app.get("/test", (req, res) => res.json({ message: "testing" }));
 app.use("/admin", Admin);
 app.use("/user", User);
 app.use("/product", Product);
