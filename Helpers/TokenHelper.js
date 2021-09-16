@@ -13,7 +13,7 @@ async function tokenHelper(req, res, next) {
         jwt.verify(SESSION_TOKEN, process.env.JWT_KEY);
         const data = await Admin.findOne({ token: SESSION_TOKEN });
         if (data) {
-            if (data?.token === SESSION_TOKEN) {
+            if (data && data.token === SESSION_TOKEN) {
                 return next();
             } else {
                 return res.json({
