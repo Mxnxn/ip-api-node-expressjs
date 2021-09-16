@@ -28,9 +28,13 @@ mongoose
 
 const Admin = require("./routes/Admin");
 const User = require("./routes/User");
+const Product = require("./routes/Product");
+const Category = require("./routes/Category");
 
 app.use("/admin", Admin);
 app.use("/user", User);
+app.use("/product", Product);
+app.use("/category", Category);
 
 app.listen(process.env.PORT, () => {
     console.log(`InvoiceMG has started on ${process.env.PORT}`);

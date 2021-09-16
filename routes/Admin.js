@@ -1,95 +1,39 @@
 const app = require("express").Router();
-const Admin = require("../Model/Admin");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const { v4: uuidv4 } = require("uuid");
-const multer = require("multer");
-const upload = multer();
-const { AdminAuthSchema } = require("../Helpers/JoiVerifier");
+const { TokenHelper } = require("../Helpers/TokenHelper");
+const upload = require("../Helpers/MulterConfig");
+const { Login, Register } = require("./Admin/Auth");
+const { addCategory, editCategory, deleteCategory } = require("./Admin/Category");
+const { GetUsers, GetUser, RestrictUser, ActivateUser } = require("./Admin/Listing");
+const { addProduct, editProductDetails, deleteProduct, editProductImages, deleteProductImages } = require("./Admin/Product");
+const { addMoneyToWallet, rejectMoneyAddtion, getRequests } = require("./Admin/Wallet");
+
 app.use("/*", (req, res, next) => next());
 
-app.post("/login", upload.none(), async (req, res) => {
-    const { error, value } = await AdminAuthSchema.validate(req.body);
-    if (error) {
-        const msgs = error.details.map((el) => el.message);
-        return res.json({
-            code: 422,
-            status: false,
-            message: msgs,
-        });
-    }
-    const data = await Admin.findOne({ email: req.body.email });
-    if (!data) {
-        return res.json({
-            code: 422,
-            status: false,
-            message: "Email doesn't exist.",
-        });
-    } else {
-        const result = await bcrypt.compare(req.body.password, data.password);
-        if (result) {
-            const uuidx = uuidv4();
-            const token = jwt.sign({ random: uuidx }, process.env.JWT_KEY);
-            data.token = token;
-            data.save();
-            return res.json({
-                code: 200,
-                data: {
-                    token: token,
-                    email: data.email,
-                    uid: data._id,
-                },
-                status: true,
-            });
-        } else {
-            return res.json({
-                code: 422,
-                message: "Invalid credential.",
-                status: false,
-            });
-        }
-    }
-});
+// ADMIN AUTH
+app.post("/login", upload.none(), Login);
+// app.post("/register", upload.none(), Register);
 
-// app.post("/register", upload.none(), async (req, res) => {
-//     if (!req.body.email || !req.body.password || !req.body.name) {
-//         return res.json({
-//             code: 422,
-//             status: false,
-//             message: "Invalid request.",
-//         });
-//     }
-//     const data = await Admin.findOne({ email: req.body.email });
-//     if (data) {
-//         return res.json({
-//             code: 401,
-//             message: "Email already Exists.",
-//             status: false,
-//         });
-//     } else {
-//         try {
-//             const salt = await bcrypt.genSalt(10);
-//             const hashedPassword = await bcrypt.hash(req.body.password, salt);
+// ADMIN UserList
+app.get("/users", TokenHelper, upload.none(), GetUsers);
+app.get("/user/:uid", TokenHelper, upload.none(), GetUser);
+app.get("/user/restrict/:uid", TokenHelper, upload.none(), RestrictUser);
+app.get("/user/activate/:uid", TokenHelper, upload.none(), ActivateUser);
 
-//             const mUser = new Admin({
-//                 email: req.body.email,
-//                 password: hashedPassword,
-//                 name: req.body.name,
-//             });
+// ADMIN ADD/REJECT MONEY TO WALLET
+app.post("/add/towallet", TokenHelper, upload.none(), addMoneyToWallet);
+app.post("/add/reject", TokenHelper, upload.none(), rejectMoneyAddtion);
+// ADMIN GET ALL REQUESTS
+app.get("/wallet/requests/:page", TokenHelper, upload.none(), getRequests);
+// ADMIN CATEGORY
+app.post("/category/add", TokenHelper, upload.none(), addCategory);
+app.post("/category/edit", TokenHelper, upload.none(), editCategory);
+app.get("/category/delete/:id", TokenHelper, upload.none(), deleteCategory);
 
-//             const savedData = await mUser.save();
-//             if (savedData) {
-//                 return res.json({
-//                     code: 200,
-//                     message: "Registration successful",
-//                     status: true,
-//                 });
-//             }
-//         } catch (err) {
-//             res.json({ code: 500, message: "Internal error", status: false });
-//             return res.end();
-//         }
-//     }
-// });
+// ADMIN PRODUCT
+app.post("/product/add", TokenHelper, upload.array("photos", 5), addProduct);
+app.post("/product/edit", TokenHelper, upload.none(), editProductDetails);
+app.post("/product/add/images", TokenHelper, upload.array("photos", 5), editProductImages);
+app.post("/product/delete/images", TokenHelper, upload.none(), deleteProductImages);
+app.get("/product/delete/:id", TokenHelper, upload.none(), deleteProduct);
 
 module.exports = app;

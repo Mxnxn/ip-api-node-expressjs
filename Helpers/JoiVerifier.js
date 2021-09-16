@@ -35,4 +35,39 @@ const AddWalletMoneySchema = Joi.object({
     uid: Joi.string().required(),
 });
 
-module.exports = { AdminAuthSchema, UserRegistrationSchema, UserLoginSchema, AddWalletMoneySchema };
+const GrantMoneySchema = Joi.object({
+    uid: Joi.string().required(),
+    bhid: Joi.string().required(),
+});
+
+const RejectMoneyAdditionSchema = Joi.object({
+    uid: Joi.string().required(),
+    bhid: Joi.string().required(),
+    reason: Joi.string().required(),
+});
+
+const AddBannerSchema = Joi.object({
+    alt: Joi.string().required(),
+    product: Joi.string().required(),
+});
+
+const AddProductSchema = Joi.object({
+    id: Joi.string(),
+    name: Joi.string().required(),
+    price: Joi.string().required(),
+    description: Joi.string().required(),
+    category: Joi.array().items(Joi.string()).required(),
+    gsmOrMicron: Joi.number(),
+    isAvailable: Joi.boolean(),
+});
+
+module.exports = {
+    AdminAuthSchema,
+    AddBannerSchema,
+    UserRegistrationSchema,
+    UserLoginSchema,
+    AddWalletMoneySchema,
+    GrantMoneySchema,
+    RejectMoneyAdditionSchema,
+    AddProductSchema,
+};

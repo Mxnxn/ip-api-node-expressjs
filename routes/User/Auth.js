@@ -69,7 +69,7 @@ const Register = async (req, res) => {
             companyName: value.companyName,
             street: value.street,
             gst: value.gst,
-            businessproof: req.file.filename,
+            businessproof: req.file.path,
             city: value.city,
             state: value.state,
             pincode: value.pincode,

@@ -6,12 +6,15 @@ const { getWalletWithHistory, addMoneyToWallet } = require("./User/Wallet");
 
 app.use("/*", (req, res, next) => next());
 
-// USER AUTH
-app.post("/register", upload.single("businessProof"), Register);
-app.post("/login", upload.none(), Login);
-
-//WALLET API
-app.get("/wallet/:uid", UserTokenHelper, getWalletWithHistory);
-app.post("/wallet/add", UserTokenHelper, upload.single("receipt"), addMoneyToWallet);
+/**
+ * @GET COUPONS to @ADMIN
+ * @GET Coupons Details to @ADMIN
+ * @GET Coupons Descrptive to @USER
+ * @POST Add Coupon to @ADMIN
+ * @POST Edit Coupon to @ADMIN
+ * @POST Delete Coupon to @ADMIN
+ * @POST Activate/Disable Coupon to @ADMIN
+ * @POST Apply Coupon to @USER
+ */
 
 module.exports = app;

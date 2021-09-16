@@ -17,6 +17,22 @@ const BalanceHistory = new Schema(
             ref: "Wallet",
             required: true,
         },
+        file: {
+            required: true,
+            type: String,
+        },
+        reason: {
+            type: String,
+        },
+        reject: {
+            type: Boolean,
+            default: false,
+        },
+        granted: {
+            type: Boolean,
+            required: true,
+            default: false,
+        },
     },
     { timestamps: true }
 );

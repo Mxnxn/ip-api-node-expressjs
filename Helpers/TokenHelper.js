@@ -1,5 +1,5 @@
 const Admin = require("../Model/Admin");
-
+const jwt = require("jsonwebtoken");
 async function tokenHelper(req, res, next) {
     const SESSION_TOKEN = req.header("SESSION-TOKEN");
     if (!SESSION_TOKEN) {
@@ -10,9 +10,10 @@ async function tokenHelper(req, res, next) {
         });
     }
     try {
-        const data = await Admin({ token: SESSION_TOKEN });
+        jwt.verify(SESSION_TOKEN, process.env.JWT_KEY);
+        const data = await Admin.findOne({ token: SESSION_TOKEN });
         if (data) {
-            if (data.is_active) {
+            if (data?.token === SESSION_TOKEN) {
                 return next();
             } else {
                 return res.json({
@@ -21,9 +22,14 @@ async function tokenHelper(req, res, next) {
                     status: false,
                 });
             }
+        } else {
+            return res.json({
+                code: 401,
+                message: "Unauthorized.",
+                status: false,
+            });
         }
     } catch (error) {
-        console.log(error);
         return res.json({
             code: 401,
             message: "Unauthorized.",

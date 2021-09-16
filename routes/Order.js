@@ -6,12 +6,13 @@ const { getWalletWithHistory, addMoneyToWallet } = require("./User/Wallet");
 
 app.use("/*", (req, res, next) => next());
 
-// USER AUTH
-app.post("/register", upload.single("businessProof"), Register);
-app.post("/login", upload.none(), Login);
-
-//WALLET API
-app.get("/wallet/:uid", UserTokenHelper, getWalletWithHistory);
-app.post("/wallet/add", UserTokenHelper, upload.single("receipt"), addMoneyToWallet);
+/**
+ * @GET All Orders to @ADMIN
+ * @GET Order Detail to @ADMIN & @User
+ * @POST Make Order to @USER
+ * @GET View Previous/Ongoing Order to @USER
+ * @POST Cancel Order to @USER & @ADMIN
+ * @POST Activate/Disable Product
+ */
 
 module.exports = app;
