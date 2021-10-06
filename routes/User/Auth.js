@@ -53,10 +53,7 @@ const Register = async (req, res) => {
             fs.unlink(`${req.file.path}`, (err) => {});
             return ResponseBodyError(res, { details: [{ message: "User Already Exist with this phone." }] });
         }
-        if (value.password !== value.confirmPassword) {
-            fs.unlink(`${req.file.path}`, (err) => {});
-            return Response(res, 401, ["Passwords don't match."]);
-        }
+
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(value.password, salt);
 

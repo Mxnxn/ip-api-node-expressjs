@@ -12,7 +12,6 @@ const UserRegistrationSchema = Joi.object({
         .email({ minDomainSegments: 2, tlds: { allow: ["com", "net", "in"] } })
         .required(),
     password: Joi.string().min(6).max(30).required(),
-    confirmPassword: Joi.string().min(6).max(30).required(),
     name: Joi.string().required(),
     street: Joi.string().required(),
     city: Joi.string().required(),
