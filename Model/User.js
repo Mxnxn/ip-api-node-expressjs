@@ -24,6 +24,10 @@ const User = new Schema({
         ref: "Wallet",
         required: true,
     },
+    queries: [{ type: Schema.Types.ObjectId, ref: "Query" }],
+    history: [{ type: Schema.Types.ObjectId, ref: "OrderHistory" }],
+    cart: [{ type: Schema.Types.ObjectId, ref: "Cart" }],
+    requests: [{ type: Schema.Types.ObjectId, ref: "OrderRequest" }],
 });
 
 module.exports = mongoose.model("User", User);

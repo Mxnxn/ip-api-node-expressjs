@@ -1,23 +1,31 @@
 const User = require("../../Model/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const fs = require("fs");
 const Wallet = require("../../Model/Wallet");
 const { UserLoginSchema } = require("../../Helpers/JoiVerifier");
 const { ResponseBodyError } = require("../../Helpers/BodyError");
 const { Response } = require("../../Helpers/Response");
 const { UserRegistrationSchema } = require("../../Helpers/JoiVerifier");
+const fs = require("fs");
+const { promisify } = require("util");
+
+const unlinkAsync = promisify(fs.unlink);
 
 const Login = async (req, res) => {
     try {
         const { error, value } = await UserLoginSchema.validate(req.body);
-        if (error) return ResponseBodyError(res, error);
+        if (error) return ResponseBodyError(res, error.message);
         const data = await User.findOne({ email: value.email });
         if (!data) {
             return Response(res, 422, ["Email doesn't exist."]);
         } else {
             const result = await bcrypt.compare(value.password, data.password);
             if (result) {
+                if (!data.granted_access) {
+                    return Response(res, 402, [
+                        "Your process is under review. We will contact soon via email. if you have any query mail us on carebydharmprints@gmail.com",
+                    ]);
+                }
                 const token = jwt.sign({ random: data.name }, process.env.JWT_KEY, { expiresIn: "1d" });
                 data.token = token;
                 data.save();
@@ -25,6 +33,7 @@ const Login = async (req, res) => {
                     token: token,
                     email: data.email,
                     uid: data._id,
+                    message: "Successfully Logged In",
                 });
             } else {
                 return Response(res, 422, ["Invalid credential."]);
@@ -45,12 +54,12 @@ const Register = async (req, res) => {
 
         let existingUser = await User.findOne({ email: value.email });
         if (existingUser) {
-            fs.unlink(`${req.file.path}`);
+            await unlinkAsync(`${req.file.path}`);
             return ResponseBodyError(res, { details: [{ message: "User Already Exist with this email." }] });
         }
         existingUser = await User.findOne({ phone: value.phone });
         if (existingUser) {
-            fs.unlink(`${req.file.path}`, (err) => {});
+            await unlinkAsync(`${req.file.path}`);
             return ResponseBodyError(res, { details: [{ message: "User Already Exist with this phone." }] });
         }
 

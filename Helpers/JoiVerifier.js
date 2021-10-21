@@ -20,6 +20,7 @@ const UserRegistrationSchema = Joi.object({
     companyName: Joi.string().required(),
     phone: Joi.string().length(10).required(),
     landmark: Joi.string(),
+    businessProof: Joi.allow(),
 });
 
 const UserLoginSchema = Joi.object({

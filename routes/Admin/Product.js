@@ -4,9 +4,10 @@ const Category = require("../../Model/Category");
 const Product = require("../../Model/Product");
 const { AddProductSchema } = require("../../Helpers/JoiVerifier");
 const ImageBucket = require("../../Model/ImageBucket");
+const { FilePathHelper } = require("../../Helpers/FilePathHelper");
 const fs = require("fs");
 const { promisify } = require("util");
-const { FilePathHelper } = require("../../Helpers/FilePathHelper");
+const AllProducts = require("../../Model/AllProducts");
 
 const unlinkAsync = promisify(fs.unlink);
 const addProduct = async (req, res) => {
@@ -23,6 +24,16 @@ const addProduct = async (req, res) => {
             isAvailable: value.isAvailable,
             category: value.category,
         });
+        const mAllProduct = await new AllProducts({
+            name: value.name,
+            description: value.description,
+            gsmOrMicron: value.gsmOrMicron,
+            price: value.price,
+            images: [],
+            product: mProduct._id,
+            isAvailable: value.isAvailable,
+            category: value.category,
+        });
         let imageArr = [];
         for (let i = 0; i < req.files.length; i++) {
             const image = req.files[i];
@@ -34,7 +45,9 @@ const addProduct = async (req, res) => {
             imageArr.push(mImages._id);
         }
         mProduct.images = imageArr;
-        mProduct.save();
+        mAllProduct.images = imageArr;
+        await mProduct.save();
+        await mAllProduct.save();
         return Response(res, 200, ["Successfully Added"]);
     } catch (error) {
         return Response(res, 500, ["Internal Error!"]);
@@ -54,6 +67,17 @@ const editProductDetails = async (req, res) => {
             category: value.category,
             isAvailable: value.isAvailable,
         });
+        await AllProduct.findOneAndUpdate(
+            { product: value.id },
+            {
+                name: value.name,
+                description: value.description,
+                gsmOrMicron: value.gsmOrMicron,
+                price: value.price,
+                category: value.category,
+                isAvailable: value.isAvailable,
+            }
+        );
         return Response(res, 200, ["Successfully Updated."]);
     } catch (error) {
         console.log(error);
@@ -66,6 +90,7 @@ const editProductImages = async (req, res) => {
         if (!req.body.id) return Response(res, 500, ["Something went wrong!"]);
         if (req.files.length < 1) return Response(res, 500, ["Upload atleast 1 Image"]);
         const mProduct = await Product.findById(req.body.id);
+        const mAllProduct = await AllProduct.find({ product: req.body.id });
         let imageArr = [];
         let populatedArr = [];
         for (let i = 0; i < req.files.length; i++) {
@@ -80,7 +105,9 @@ const editProductImages = async (req, res) => {
         }
         const temp = mProduct.images;
         mProduct.images = temp.concat(imageArr);
+        mAllProduct.images = temp.concat(imageArr);
         await mProduct.save();
+        await mAllProduct.save();
         return Response(res, 200, ["Successfully Updated!"]);
     } catch (error) {
         for (let index = 0; index < req.files.length; index++) {
@@ -95,11 +122,6 @@ const editProductImages = async (req, res) => {
 const deleteProduct = async (req, res) => {
     try {
         if (!req.params.id) return Response(res, 400, ["Product Id missing."]);
-        const product = await Product.findById(req.params.id).populate("images");
-        for (let idx = 0; idx < product.images.length; idx++) {
-            const prod = product.images[idx];
-            await unlinkAsync(prod.path);
-        }
         await Product.findByIdAndDelete(req.params.id);
         return Response(res, 200, ["Successfully Deleted"]);
     } catch (error) {
@@ -115,6 +137,7 @@ const deleteProductImages = async (req, res) => {
         await unlinkAsync(mImage.path);
         await ImageBucket.findByIdAndDelete(req.body.iid);
         await Product.findByIdAndUpdate(req.body.id, { $pull: { images: req.body.iid } }).populate("images");
+        await AllProduct.findOneAndUpdate({ product: req.body.id }, { $pull: { images: req.body.iid } }).populate("images");
         return Response(res, 200, ["Successfully Deleted"]);
     } catch (error) {
         for (let index = 0; index < req.files.length; index++) {

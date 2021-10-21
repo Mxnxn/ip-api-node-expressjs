@@ -4,11 +4,14 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 const path = require("path");
 const cors = require("cors");
+const exphbs = require("express-handlebars");
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.engine("handlebars", exphbs({ defaultLayout: null }));
+app.set("view engine", "handlebars");
 const options = {
     user: process.env.DB_USER,
     pass: process.env.DB_PASSWORD,
