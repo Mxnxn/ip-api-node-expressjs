@@ -20,34 +20,27 @@ const addProduct = async (req, res) => {
             description: value.description,
             gsmOrMicron: value.gsmOrMicron,
             price: value.price,
+            numericPrice: value.numericPrice,
             images: [],
             isAvailable: value.isAvailable,
             category: value.category,
+            sizes: value.sizes,
+            sizeWithQty: value.sizeWithQty,
+            eyelets: value.eyelets,
         });
-        const mAllProduct = await new AllProducts({
-            name: value.name,
-            description: value.description,
-            gsmOrMicron: value.gsmOrMicron,
-            price: value.price,
-            images: [],
-            product: mProduct._id,
-            isAvailable: value.isAvailable,
-            category: value.category,
-        });
+
         let imageArr = [];
         for (let i = 0; i < req.files.length; i++) {
             const image = req.files[i];
             const mImages = await new ImageBucket({
-                url: image.filename,
+                url: image.destination + image.filename,
                 path: image.path,
                 product: mProduct._id,
             }).save();
             imageArr.push(mImages._id);
         }
         mProduct.images = imageArr;
-        mAllProduct.images = imageArr;
         await mProduct.save();
-        await mAllProduct.save();
         return Response(res, 200, ["Successfully Added"]);
     } catch (error) {
         return Response(res, 500, ["Internal Error!"]);
@@ -66,20 +59,18 @@ const editProductDetails = async (req, res) => {
             price: value.price,
             category: value.category,
             isAvailable: value.isAvailable,
+            sizeWithQty: value.sizeWithQty,
+            sizes: value.sizes,
+            eyelets: value.eyelets,
         });
-        await AllProduct.findOneAndUpdate(
-            { product: value.id },
-            {
-                name: value.name,
-                description: value.description,
-                gsmOrMicron: value.gsmOrMicron,
-                price: value.price,
-                category: value.category,
-                isAvailable: value.isAvailable,
-            }
-        );
+
         return Response(res, 200, ["Successfully Updated."]);
     } catch (error) {
+        for (let index = 0; index < req.files.length; index++) {
+            const prod = req.files[index];
+            await unlinkAsync(prod.path);
+            await ImageBucket.findOneAndDelete({ path: prod.path });
+        }
         console.log(error);
         return Response(res, 500, ["Internal Error!"]);
     }
@@ -96,7 +87,7 @@ const editProductImages = async (req, res) => {
         for (let i = 0; i < req.files.length; i++) {
             const image = req.files[i];
             const mImages = await new ImageBucket({
-                url: image.filename,
+                url: image.destination + image.filename,
                 path: image.path,
                 product: mProduct._id,
             }).save();

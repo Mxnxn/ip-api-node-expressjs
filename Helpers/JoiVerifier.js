@@ -59,6 +59,19 @@ const AddProductSchema = Joi.object({
     category: Joi.array().items(Joi.string()).required(),
     gsmOrMicron: Joi.number(),
     isAvailable: Joi.boolean(),
+    sizeWithQty: Joi.boolean(),
+    numericPrice: Joi.number(),
+    sizes: Joi.array().items(Joi.number()),
+    eyelets: Joi.boolean(),
+});
+
+const AddCartProductSchema = Joi.object({
+    uid: Joi.string(),
+    pid: Joi.string(),
+    qty: Joi.boolean(),
+    rate: Joi.number(),
+    len: Joi.number(),
+    height: Joi.number(),
 });
 
 module.exports = {
@@ -70,4 +83,5 @@ module.exports = {
     GrantMoneySchema,
     RejectMoneyAdditionSchema,
     AddProductSchema,
+    AddCartProductSchema,
 };

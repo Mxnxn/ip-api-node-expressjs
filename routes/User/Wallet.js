@@ -25,7 +25,7 @@ const addMoneyToWallet = async (req, res) => {
             balance: value.amount,
             wallet: mWallet._id,
             uid: value.uid,
-            file: req.file.filename,
+            file: req.file.destination + req.file.filename,
             granted: false,
         });
         mTransaction.save();

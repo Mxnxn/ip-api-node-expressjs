@@ -11,9 +11,12 @@ const Product = new Schema({
         type: Boolean,
         default: false,
     },
+    numericPrice: { type: Number, required: true },
     category: [{ type: Schema.Types.ObjectId, ref: "Category", required: true }],
     images: [{ type: Schema.Types.ObjectId, ref: "ImageBucket", required: true }],
     reviews: { type: Schema.Types.ObjectId, ref: "Reviews" },
+    sizes: [{ type: Number }],
+    eyelets: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model("Product", Product);

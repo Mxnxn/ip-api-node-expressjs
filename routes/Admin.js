@@ -1,6 +1,7 @@
 const app = require("express").Router();
 const { TokenHelper } = require("../Helpers/TokenHelper");
 const upload = require("../Helpers/MulterConfig");
+const uploadDynamic = require("../Helpers/DynamicMulterDest")("products/");
 const { Login, Register } = require("./Admin/Auth");
 const { addCategory, editCategory, deleteCategory } = require("./Admin/Category");
 const { GetUsers, GetUser, RestrictUser, ActivateUser } = require("./Admin/Listing");
@@ -30,9 +31,9 @@ app.post("/category/edit", TokenHelper, upload.none(), editCategory);
 app.get("/category/delete/:id", TokenHelper, upload.none(), deleteCategory);
 
 // ADMIN PRODUCT
-app.post("/product/add", TokenHelper, upload.array("photos", 5), addProduct);
+app.post("/product/add", TokenHelper, uploadDynamic.array("photos", 5), addProduct);
 app.post("/product/edit", TokenHelper, upload.none(), editProductDetails);
-app.post("/product/add/images", TokenHelper, upload.array("photos", 5), editProductImages);
+app.post("/product/add/images", TokenHelper, uploadDynamic.array("photos", 5), editProductImages);
 app.post("/product/delete/images", TokenHelper, upload.none(), deleteProductImages);
 app.get("/product/delete/:id", TokenHelper, upload.none(), deleteProduct);
 

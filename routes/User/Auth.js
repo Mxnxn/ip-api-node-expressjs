@@ -8,6 +8,7 @@ const { Response } = require("../../Helpers/Response");
 const { UserRegistrationSchema } = require("../../Helpers/JoiVerifier");
 const fs = require("fs");
 const { promisify } = require("util");
+const Cart = require("../../Model/Cart/Cart");
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -86,7 +87,11 @@ const Register = async (req, res) => {
             currentBalance: 0,
             uid: mUser._id,
         }).save();
+        const mCart = await new Cart({
+            uid: mUser._id,
+        }).save();
         mUser.wallet = mWallet._id;
+        mUser.cart = mCart._id;
         mUser.save();
         const temp = { ...mUser._doc };
         delete temp["password"];
