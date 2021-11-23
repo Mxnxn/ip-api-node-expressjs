@@ -12,8 +12,10 @@ var storage = (suffix) =>
         },
     });
 const fileFilter = (req, file, cb) => {
-    console.log(file);
-    cb(null, false);
+    const arr = file.originalname.split(".");
+    const ext = arr[arr.length - 1];
+    if (ext.toLowerCase().trim() === "cdr") cb(null, true);
+    else cb(null, false);
 };
 const upload = (suffix, ext) =>
     multer({

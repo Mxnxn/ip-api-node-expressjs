@@ -7,9 +7,9 @@ const ImageBucket = require("../../Model/ImageBucket");
 const { FilePathHelper } = require("../../Helpers/FilePathHelper");
 const fs = require("fs");
 const { promisify } = require("util");
+const unlinkAsync = promisify(fs.unlink);
 const AllProducts = require("../../Model/AllProducts");
 
-const unlinkAsync = promisify(fs.unlink);
 const addProduct = async (req, res) => {
     try {
         const { value, error } = await AddProductSchema.validate(req.body);

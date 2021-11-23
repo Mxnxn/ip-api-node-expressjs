@@ -66,12 +66,21 @@ const AddProductSchema = Joi.object({
 });
 
 const AddCartProductSchema = Joi.object({
+    name: Joi.string().required(),
+    price: Joi.string().required(),
+    description: Joi.string().required(),
+    category: Joi.array().items(Joi.string()).required(),
+    images: Joi.array().items(Joi.string()).required(),
+    gsmOrMicron: Joi.number(),
+    numericPrice: Joi.number(),
+    eyelets: Joi.boolean(),
     uid: Joi.string(),
     pid: Joi.string(),
-    qty: Joi.boolean(),
+    qty: Joi.number(),
     rate: Joi.number(),
     len: Joi.number(),
     height: Joi.number(),
+    designFile: Joi.allow(),
 });
 
 module.exports = {

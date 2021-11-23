@@ -5,7 +5,7 @@ const uploadCDR = require("../Helpers/Multer/UploadCDR");
 const { UserTokenHelper } = require("../Helpers/UserTokenHelper");
 const { Login, Register } = require("./User/Auth");
 const { getWalletWithHistory, addMoneyToWallet } = require("./User/Wallet");
-const { addItemToCart, getCartWithItems } = require("./User/Cart");
+const { addItemToCart, getCartWithItems, removeItemsFromCart } = require("./User/Cart");
 const { GetUserForUser } = require("./User/Listing");
 const { sendEmailToUser, resetPassword, CheckingToken } = require("./User/MailHandler");
 
@@ -29,6 +29,7 @@ app.post("/wallet/add", UserTokenHelper, uploadDynamic("requests/").single("rece
 
 // CART API
 app.get("/cart/:uid", UserTokenHelper, upload.none(), getCartWithItems);
-app.post("/cart/add", UserTokenHelper, uploadCDR("designs/").single("design"), addItemToCart);
+app.post("/cart/add", UserTokenHelper, uploadCDR("designs/").single("designFile"), addItemToCart);
+app.post("/cart/remove", UserTokenHelper, upload.none(), removeItemsFromCart);
 
 module.exports = app;
