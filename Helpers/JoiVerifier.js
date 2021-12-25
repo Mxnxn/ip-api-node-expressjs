@@ -22,6 +22,17 @@ const UserRegistrationSchema = Joi.object({
     landmark: Joi.string(),
     businessProof: Joi.allow(),
 });
+const UserUpdationSchema = Joi.object({
+    _id: Joi.string().required(),
+    name: Joi.string().required(),
+    street: Joi.string().required(),
+    city: Joi.string().required(),
+    state: Joi.string().required(),
+    pincode: Joi.string().required(),
+    companyName: Joi.string().required(),
+    phone: Joi.string().length(10).required(),
+    landmark: Joi.string(),
+});
 
 const UserLoginSchema = Joi.object({
     email: Joi.string()
@@ -93,4 +104,5 @@ module.exports = {
     RejectMoneyAdditionSchema,
     AddProductSchema,
     AddCartProductSchema,
+    UserUpdationSchema,
 };

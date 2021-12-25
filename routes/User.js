@@ -6,7 +6,7 @@ const { UserTokenHelper } = require("../Helpers/UserTokenHelper");
 const { Login, Register } = require("./User/Auth");
 const { getWalletWithHistory, addMoneyToWallet } = require("./User/Wallet");
 const { addItemToCart, getCartWithItems, removeItemsFromCart } = require("./User/Cart");
-const { GetUserForUser } = require("./User/Listing");
+const { GetUserForUser, UpdateUserDetail } = require("./User/Listing");
 const { sendEmailToUser, resetPassword, CheckingToken } = require("./User/MailHandler");
 
 app.use("/*", (req, res, next) => next());
@@ -18,6 +18,7 @@ app.post("/login", upload.none(), Login);
 app.post("/forgetPassword", upload.none(), sendEmailToUser);
 
 app.get("/:uid", UserTokenHelper, upload.none(), GetUserForUser);
+app.post("/:uid", UserTokenHelper, upload.none(), UpdateUserDetail);
 
 app.post("/changePassword", upload.none(), resetPassword);
 

@@ -17,6 +17,8 @@ const Product = new Schema({
     reviews: { type: Schema.Types.ObjectId, ref: "Reviews" },
     sizes: [{ type: Number }],
     eyelets: { type: Boolean, default: false },
+    hasVariants: { type: Boolean, default: false },
+    variants: [{ type: Schema.Types.ObjectId, ref: "Variant" }],
 });
 
 module.exports = mongoose.model("Product", Product);

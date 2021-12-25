@@ -2,6 +2,7 @@ const { Response } = require("../../Helpers/Response");
 const { ResponseBodyError } = require("../../Helpers/BodyError");
 const Category = require("../../Model/Category");
 const Product = require("../../Model/Product");
+const Variant = require("../../Model/Variant");
 const { AddProductSchema } = require("../../Helpers/JoiVerifier");
 const ImageBucket = require("../../Model/ImageBucket");
 const { FilePathHelper } = require("../../Helpers/FilePathHelper");
@@ -151,6 +152,65 @@ const ChangeVisibility = async (req, res) => {
     }
 };
 
+const AddVariant = async (req, res) => {
+    try {
+        if (!req.body.variant || req.body.variant.length < 1) {
+            return Response(res, 404, ["Add Alteast 1 Variant to Product Before Save"]);
+        }
+        const variants = req.body.variant;
+        for (let index = 0; index < variants.length; index++) {
+            const variant = JSON.parse(variants[index]);
+            const mVariant = await new Variant({
+                pid: variant.pid,
+                name: variant.name,
+                details: variant.details,
+                price: variant.price,
+                numericPrice: variant.numericPrice,
+            }).save();
+            await Product.findByIdAndUpdate(variant.pid, { $push: { variants: mVariant._id }, haveVariants: true });
+        }
+        return Response(res, 200, ["Variants Successfully Added"]);
+    } catch (error) {
+        console.log(error);
+        return Response(res, 500, ["Internal Error!"]);
+    }
+};
+const EditVariant = async (req, res) => {
+    try {
+        if (!req.body._id || !req.body.details || !req.body.price || !req.body.numericPrice || !req.body.name) {
+            return Response(res, 401, ["Enter Details Properly to Update Variant!"]);
+        }
+        await Variant.findByIdAndUpdate(req.body._id, {
+            name: req.body.name,
+            details: req.body.details,
+            price: req.body.price,
+            numericPrice: req.body.numericPrice,
+        });
+        return Response(res, 200, ["Variant Successfully Updated"]);
+    } catch (error) {
+        console.log(error);
+        return Response(res, 500, ["Internal Error!"]);
+    }
+};
+const DeleteVariant = async (req, res) => {
+    try {
+        if (!req.body._id || !req.body.pid) {
+            return Response(res, 404, ["Missing Body!"]);
+        }
+        await Variant.findByIdAndDelete(req.body._id);
+        const mProducts = await Product.findById(req.body.pid);
+        if (mProducts.variants.length < 1) {
+            await Product.findByIdAndUpdate(req.body.pid, { $pull: { variants: req.body._id }, hasVariants: false });
+        } else {
+            await Product.findByIdAndUpdate(req.body.pid, { $pull: { variants: req.body._id } });
+        }
+        return Response(res, 200, ["Variant Successfully Updated"]);
+    } catch (error) {
+        console.log(error);
+        return Response(res, 500, ["Internal Error!"]);
+    }
+};
+
 module.exports = {
     addProduct,
     deleteProduct,
@@ -158,4 +218,7 @@ module.exports = {
     editProductImages,
     deleteProductImages,
     ChangeVisibility,
+    AddVariant,
+    EditVariant,
+    DeleteVariant,
 };

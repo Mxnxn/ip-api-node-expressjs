@@ -59,7 +59,7 @@ app.get("/getAll", async (req, res) => {
 
 app.get("/get/:id", async (req, res) => {
     if (!req.params.id) return Response(res, 400, ["Product id missing in body"]);
-    const product = await Product.findById(req.params.id).populate({ path: "category" }).populate({ path: "images" });
+    const product = await Product.findById(req.params.id).populate({ path: "category" }).populate({ path: "variants" }).populate({ path: "images" });
     return Response(res, 200, product);
 });
 

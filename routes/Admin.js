@@ -5,7 +5,16 @@ const uploadDynamic = require("../Helpers/DynamicMulterDest")("products/");
 const { Login, Register } = require("./Admin/Auth");
 const { addCategory, editCategory, deleteCategory } = require("./Admin/Category");
 const { GetUsers, GetUser, RestrictUser, ActivateUser } = require("./Admin/Listing");
-const { addProduct, editProductDetails, deleteProduct, editProductImages, deleteProductImages } = require("./Admin/Product");
+const {
+    addProduct,
+    editProductDetails,
+    deleteProduct,
+    editProductImages,
+    deleteProductImages,
+    AddVariant,
+    EditVariant,
+    DeleteVariant,
+} = require("./Admin/Product");
 const { addMoneyToWallet, rejectMoneyAddtion, getRequests } = require("./Admin/Wallet");
 
 app.use("/*", (req, res, next) => next());
@@ -36,5 +45,8 @@ app.post("/product/edit", TokenHelper, upload.none(), editProductDetails);
 app.post("/product/add/images", TokenHelper, uploadDynamic.array("photos", 5), editProductImages);
 app.post("/product/delete/images", TokenHelper, upload.none(), deleteProductImages);
 app.get("/product/delete/:id", TokenHelper, upload.none(), deleteProduct);
+app.post("/product/add/variant", TokenHelper, upload.none(), AddVariant);
+app.post("/product/edit/variant", TokenHelper, upload.none(), EditVariant);
+app.post("/product/delete/variant", TokenHelper, upload.none(), DeleteVariant);
 
 module.exports = app;

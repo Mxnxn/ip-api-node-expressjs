@@ -15,7 +15,7 @@ const unlinkAsync = promisify(fs.unlink);
 const Login = async (req, res) => {
     try {
         const { error, value } = await UserLoginSchema.validate(req.body);
-        if (error) return ResponseBodyError(res, error.message);
+        if (error) return Response(res, 422, [error.message+"."]);
         const data = await User.findOne({ email: value.email });
         if (!data) {
             return Response(res, 422, ["Email doesn't exist."]);

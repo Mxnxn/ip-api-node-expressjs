@@ -56,7 +56,6 @@ const getCartWithItems = async (req, res) => {
 const removeItemsFromCart = async (req, res) => {
     try {
         if (!req.body.uid || !req.body.cpid) return Response(res, 400, ["Bad Request."]);
-
         const mCartProduct = await CartProduct.findByIdAndDelete(req.body.cpid);
         await unlinkAsync(mCartProduct.designFile);
         const mUpdatedCart = await Cart.findOneAndUpdate({ uid: req.body.uid }, { $pull: { products: mCartProduct._id } }).populate({
